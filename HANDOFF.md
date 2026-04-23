@@ -99,7 +99,7 @@ curl https://<Render URL>/health
 3. 「**検証**」ボタン → 「成功」が出れば OK
 4. **重要**: Render **Free** プランだとコールドスタートの影響で最初のメッセージが失敗しやすい
    - すぐに使う場合は Render ダッシュボード → Settings → Plan で **Starter** にアップグレード（$7/月）
-   - もしくは、LINE からメッセージ送信直前に `curl https://<Render URL>/health` を叩いてインスタンスを起こしてから送る
+   - もしくは、LINE からメッセージ送信直前に、ブラウザで `https://<Render URL>/health` を開く（または `curl` で呼び出す）→ インスタンスが起動してから送る
 
 ### Step 7: 実機再テスト
 

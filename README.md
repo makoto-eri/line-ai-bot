@@ -63,7 +63,7 @@ pytest
 - **`render.yaml` の `plan: free` は疎通確認・ポートフォリオ閲覧専用。** Render Free は 15 分アイドルでスピンダウンし、次回リクエストで約 1 分のコールドスタートが発生する。LINE の `reply_token` は Webhook 受信後 1 分以内に使う必要があるため、Free に Webhook を向けた直後の初回メッセージは失敗しやすい。
 - **LINE Webhook URL を Render に向ける前に、Render ダッシュボードで Starter 以上へ変更すること。** 常時起動となり reply_token の 1 分制限に余裕を持って間に合う。
 - Free のまま LINE 実機テストをする場合の回避策：
-  1. LINE からメッセージ送信する直前に `curl https://<render-url>/health` を手で叩いてインスタンスを起こす
+  1. LINE からメッセージ送信する直前に、ブラウザで `https://<render-url>/health` を開く（または `curl` で叩く）→ インスタンスが起動する
   2. その直後（30 秒以内目安）に LINE からメッセージ送信
   - この運用は動作確認専用で、継続利用には向かない
 
