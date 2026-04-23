@@ -23,6 +23,10 @@ _IDEMPOTENCY_MAX_ENTRIES = 10000
 _seen_event_expiry: "OrderedDict[str, float]" = OrderedDict()
 _seen_event_lock = threading.Lock()
 
+_CLAUDE_FAILURE_REPLY = (
+    "すみません。今は応答できません。少し時間をおいて再度お試しください。"
+)
+
 
 def _already_seen(event_id: str) -> bool:
     now = time.monotonic()
@@ -70,6 +74,10 @@ async def callback(
         logger.exception("failed to parse webhook body")
         raise HTTPException(status_code=400, detail="invalid webhook body") from exc
 
+    # Day 1 方針: 1 Webhook に複数テキストイベントが入っていても
+    # reply_token の 1 分制限を守るため先頭 1 件だけ処理する。
+    # それ以降のイベントはログに残してスキップする。
+    handled = False
     for event in events:
         if not isinstance(event, MessageEvent):
             continue
@@ -92,13 +100,20 @@ async def callback(
         if not user_text:
             continue
 
+        if handled:
+            logger.info(
+                "skipping additional text event in same webhook (event_id=%s)",
+                event_id,
+            )
+            continue
+
         try:
             reply_text = await run_in_threadpool(
                 claude_client.generate_reply, user_text
             )
         except Exception:
             logger.exception("failed to generate claude response")
-            reply_text = "すみません。今は応答できません。少し時間をおいて再度お試しください。"
+            reply_text = _CLAUDE_FAILURE_REPLY
 
         try:
             await run_in_threadpool(
@@ -106,5 +121,7 @@ async def callback(
             )
         except Exception:
             logger.exception("failed to send line reply")
+
+        handled = True
 
     return {"status": "ok"}
