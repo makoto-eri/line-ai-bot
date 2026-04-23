@@ -1,6 +1,13 @@
 # HANDOFF — line-ai-bot
 
-最終更新: 2026-04-24 未明（Day 1 実機テスト成功、GitHub push 済み、Render デプロイ待ち）
+最終更新: 2026-04-24 朝（**Render 本番稼働成功・全工程完了**）
+
+## 本番 URL
+
+- **LINE Bot**: LINE アプリで「Claude業務相談」を友だち追加 → メッセージ送信
+- **Render Webhook**: https://line-ai-bot-phya.onrender.com/callback
+- **Render 管理ダッシュボード**: https://dashboard.render.com/
+- **GitHub リポジトリ**: https://github.com/makoto-eri/line-ai-bot （private）
 
 ## プロジェクト概要
 
@@ -25,12 +32,20 @@ LINE Messaging API + Claude API（Opus 4.7）で業務相談 Bot を作る。Fas
   - コミット: `3fe33f0 chore: adopt codex-bridge folder layout`
   - コミット: `319a236 initial commit: minimal LINE bot with Claude Opus 4.7`
 
-### 未着手（朝やる）
+### 本番稼働確認
 
-- Render デプロイ（下記「朝の作業手順」）
-- LINE Webhook URL を ngrok → Render に切替
-- Render 側で実機再テスト
-- 必要なら GitHub repo を private → public に変更（ポートフォリオ公開用）
+- 2026-04-24 07:26 (JST) Render 初回デプロイ成功
+- `/health` エンドポイント疎通確認済み
+- LINE Webhook URL を Render URL に切替
+- 実機テスト: 「おはよう」→「おはようございます。ご相談内容をどうぞ」の Claude 応答確認
+
+### 任意の追加作業（必要なら）
+
+- GitHub repo を private → public に変更（ポートフォリオ公開用）
+  - https://github.com/makoto-eri/line-ai-bot → Settings → Danger Zone → Change visibility
+- Render Starter プランへアップグレード（$7/月、常時稼働、コールドスタート解消）
+  - Render Dashboard → line-ai-bot → Settings → Plan
+- README をポートフォリオ向けに整形（スクリーンショット、バッジ、QR コード等）
 
 ---
 
