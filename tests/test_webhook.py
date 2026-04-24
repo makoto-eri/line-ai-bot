@@ -287,6 +287,55 @@ def test_line_client_does_not_truncate_short_text():
     assert _truncate_for_line(text) == text
 
 
+def test_sanitize_strips_bold_asterisks():
+    from app.line_client import _sanitize_for_line
+
+    assert _sanitize_for_line("これは**重要**です") == "これは重要です"
+    assert _sanitize_for_line("**件名:** 【お詫び】") == "件名: 【お詫び】"
+
+
+def test_sanitize_converts_headers():
+    from app.line_client import _sanitize_for_line
+
+    assert _sanitize_for_line("## 主な違い\n内容") == "【主な違い】\n内容"
+    assert _sanitize_for_line("# タイトル") == "【タイトル】"
+
+
+def test_sanitize_converts_leading_bullets():
+    from app.line_client import _sanitize_for_line
+
+    src = "手順:\n- ステップ1\n- ステップ2\n  - 補足"
+    expected = "手順:\n・ステップ1\n・ステップ2\n  ・補足"
+    assert _sanitize_for_line(src) == expected
+
+
+def test_sanitize_removes_inline_code_and_fences():
+    from app.line_client import _sanitize_for_line
+
+    src = "コマンドは `curl ...` です\n\n```bash\nuvicorn app:main\n```"
+    result = _sanitize_for_line(src)
+    assert "`" not in result
+    assert "```" not in result
+    assert "curl ..." in result
+    assert "uvicorn app:main" in result
+
+
+def test_sanitize_flattens_markdown_links():
+    from app.line_client import _sanitize_for_line
+
+    src = "詳細は [公式サイト](https://example.com) を参照"
+    assert _sanitize_for_line(src) == "詳細は 公式サイト (https://example.com) を参照"
+
+
+def test_format_for_line_chains_sanitize_and_truncate():
+    from app.line_client import _LINE_TEXT_MAX_CHARS, format_for_line
+
+    body = "**" + ("長" * _LINE_TEXT_MAX_CHARS) + "**"
+    result = format_for_line(body)
+    assert "**" not in result
+    assert len(result) <= _LINE_TEXT_MAX_CHARS
+
+
 def test_claude_client_sets_short_timeout_and_disables_retry():
     """LINE reply_token の 1 分制限を守るため timeout=30s / max_retries=0 を固定する"""
     from app.claude_client import (
